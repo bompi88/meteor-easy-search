@@ -120,6 +120,35 @@ if (Meteor.isServer) {
   }
 
   /**
+   * Put mapping according to mapping field provided when creating an EasySearch index
+   *
+   * @param {Object} indexConfig Index configuration
+   */
+  putMapping(indexConfig = {}, cb) {
+    const {
+      mapping: body,
+      elasticSearchClient,
+      name: type
+    } = indexConfig;
+
+    if (!body) {
+      return cb();
+    }
+
+    elasticSearchClient.indices.create({
+      updateAllTypes: false,
+      index: 'easysearch'
+    }, Meteor.bindEnvironment(() => {
+      elasticSearchClient.indices.putMapping({
+        updateAllTypes: false,
+        index: 'easysearch',
+        type,
+        body
+      }, cb);
+    }));
+  }
+
+  /**
    * Act on index creation.
    *
    * @param {Object} indexConfig Index configuration
@@ -129,13 +158,15 @@ if (Meteor.isServer) {
 
     if (Meteor.isServer) {
       indexConfig.elasticSearchClient = new elasticsearch.Client(this.config.client);
-      indexConfig.elasticSearchSyncer = new ElasticSearchDataSyncer({
-        indexName: 'easysearch',
-        indexType: indexConfig.name,
-        collection: indexConfig.collection,
-        client: indexConfig.elasticSearchClient,
-        beforeIndex: (doc) => this.callConfigMethod('getElasticSearchDoc', doc, this.callConfigMethod('fieldsToIndex', indexConfig))
-      });
+      this.putMapping(indexConfig, Meteor.bindEnvironment(() => {
+        indexConfig.elasticSearchSyncer = new ElasticSearchDataSyncer({
+          indexName: 'easysearch',
+          indexType: indexConfig.name,
+          collection: indexConfig.collection,
+          client: indexConfig.elasticSearchClient,
+          beforeIndex: (doc) => this.callConfigMethod('getElasticSearchDoc', doc, this.callConfigMethod('fieldsToIndex', indexConfig))
+        });
+      }));
     }
   }
 
