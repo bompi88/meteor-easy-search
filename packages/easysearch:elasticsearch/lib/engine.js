@@ -141,12 +141,22 @@ if (Meteor.isServer) {
       updateAllTypes: false,
       index: 'easysearch'
     }, Meteor.bindEnvironment(() => {
-      elasticSearchClient.indices.putMapping({
-        updateAllTypes: false,
+      elasticSearchClient.indices.getMapping({
         index: 'easysearch',
-        type,
-        body
-      }, cb);
+        type
+      }, Meteor.bindEnvironment((err, res) => {
+        const isEmpty = Object.keys(res).length === 0 && res.constructor === Object;
+        if (!isEmpty) {
+          return;
+        }
+
+        elasticSearchClient.indices.putMapping({
+          updateAllTypes: false,
+          index: 'easysearch',
+          type,
+          body
+        }, cb);
+      }));
     }));
   }
 
