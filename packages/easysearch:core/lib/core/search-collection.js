@@ -184,7 +184,6 @@ class SearchCollection {
       this.added(collectionName, 'searchCount' + definitionString, { count });
 
       let intervalID;
-
       if (collectionScope._indexConfiguration.countUpdateIntervalMs) {
         intervalID = Meteor.setInterval(
           () => this.changed(
@@ -196,8 +195,28 @@ class SearchCollection {
         );
       }
 
+      const aggs = cursor._aggs;
+
+      if (aggs) {
+        this.added(collectionName, 'aggs' + definitionString, { aggs });
+      }
+
+      let intervalAggsID;
+
+      if (aggs && collectionScope._indexConfiguration.aggsUpdateIntervalMs) {
+        intervalID = Meteor.setInterval(
+          () => this.changed(
+            collectionName,
+            'aggs' + definitionString,
+            { aggs }
+          ),
+          collectionScope._indexConfiguration.aggsUpdateIntervalMs
+        );
+      }
+
       this.onStop(function () {
         intervalID && Meteor.clearInterval(intervalID);
+        intervalAggsID && Meteor.clearInterval(intervalAggsID);
         resultsHandle && resultsHandle.stop();
       });
 
