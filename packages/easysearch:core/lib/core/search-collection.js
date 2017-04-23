@@ -189,7 +189,8 @@ class SearchCollection {
           () => this.changed(
             collectionName,
             'searchCount' + definitionString,
-            { count: cursor.mongoCursor.count && cursor.mongoCursor.count() || 0 }
+            // TODO: I substituted cursor.mongoCursor.count with cursor.count. will this break things?
+            { count: cursor.count && cursor.count() || 0 }
           ),
           collectionScope._indexConfiguration.countUpdateIntervalMs
         );

@@ -40,7 +40,7 @@ class ESSearchCollection extends SearchCollection {
     let mongoCursor = this._getMongoCursor(searchDefinition, options);
 
     if (!_.isNumber(count)) {
-      return new ESCursor(mongoCursor, 0, false, aggs);
+      return new ESCursor(mongoCursor, 0, false, null, aggs);
     }
 
     return new ESCursor(mongoCursor, count, true, publishHandle, aggs);

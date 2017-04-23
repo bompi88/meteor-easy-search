@@ -161,7 +161,7 @@ if (Meteor.isServer) {
     }
 
     indexConfig.searchCollection = new ESSearchCollection(indexConfig, this);
-    indexConfig.mongoCollection = indexConfig.searchCollection._hitsCollection;
+    indexConfig.mongoCollection = indexConfig.searchCollection._collection;
 
     if (Meteor.isServer) {
       indexConfig.elasticSearchClient = new elasticsearch.Client(this.config.client);
@@ -218,7 +218,7 @@ if (Meteor.isServer) {
           })
         }, { limit: options.search.limit });
       } else {
-        cursor = EasySearch.ESCursor.emptyCursor;
+        cursor = ESCursor.emptyCursor;
       }
 
       fut['return'](new ESCursor(cursor, total, true, null, aggs));
