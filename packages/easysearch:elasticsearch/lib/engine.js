@@ -143,10 +143,10 @@ if (Meteor.isServer) {
 
     elasticSearchClient.indices.create({
       updateAllTypes: false,
-      index: 'easysearch'
+      index: this.indexName
     }, Meteor.bindEnvironment(() => {
       elasticSearchClient.indices.getMapping({
-        index: 'easysearch',
+        index: this.indexName,
         type
       }, Meteor.bindEnvironment((err, res) => {
         const isEmpty = Object.keys(res).length === 0 && res.constructor === Object;
@@ -156,7 +156,7 @@ if (Meteor.isServer) {
 
         elasticSearchClient.indices.putMapping({
           updateAllTypes: false,
-          index: 'easysearch',
+          index: this.indexName,
           type,
           body
         }, cb);
